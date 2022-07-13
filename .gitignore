@@ -1,0 +1,8 @@
+
+cmake-build-debug-cuda/
+
+cmake-build-release/
+
+cmake-build-release-cuda/
+
+.idea/
