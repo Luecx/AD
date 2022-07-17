@@ -51,6 +51,7 @@ struct Episode {
     void finishEpisode(float discount_factor = 0.99, float smoothing = 0.95) {
         for (int i = states.size() - 1; i >= 0; i--) {
             // define delta
+
             float delta = states[i].m_reward;
             if (i != states.size() - 1) {
                 delta += discount_factor * states[i + 1].m_q_value - states[i].m_q_value;
@@ -86,14 +87,19 @@ struct Episode {
            << std::setw(35) << std::right << "state"
            << std::setw(10) << std::right << "action"
            << std::setw(10) << std::right << "reward"
+           << std::setw(10) << std::right << "p-value"
+           << std::setw(10) << std::right << "q-value"
            << std::setw(10) << std::right << "advantage"
            << std::setw(10) << std::right << "return" << "\n";
+
         for(int i = 0; i < episode.states.size(); i++){
             const State& s = episode.states[i];
             os << std::setw(3 ) << std::right << (i)
                << std::setw(35) << std::right << ("1D-Vector (" + std::to_string(s.m_state.size()) + " values)")
                << std::setw(10) << std::right << s.m_action
                << std::setw(10) << std::right << s.m_reward
+               << std::setw(10) << std::right << s.m_p_values[s.m_action]
+               << std::setw(10) << std::right << s.m_q_value
                << std::setw(10) << std::right << s.m_advantage
                << std::setw(10) << std::right << s.m_return << "\n";
         }

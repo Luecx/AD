@@ -40,6 +40,10 @@ __global__ void base_operator_kernel(
         C[idx] = A[idx] / B[idx];
     } else if constexpr (operation == BASE_OPERATOR_OP_MUL) {
         C[idx] = A[idx] * B[idx];
+    } else if constexpr (operation == BASE_OPERATOR_OP_MIN) {
+        C[idx] = min(A[idx], B[idx]);
+    } else if constexpr (operation == BASE_OPERATOR_OP_MAX) {
+        C[idx] = max(A[idx], B[idx]);
     }
 }
 
@@ -56,6 +60,14 @@ template void __global__ base_operator_kernel<BASE_OPERATOR_OP_DIV>(const float*
                                                                     float* __restrict__ C,
                                                                     unsigned int size);
 template void __global__ base_operator_kernel<BASE_OPERATOR_OP_MUL>(const float* __restrict__ A,
+                                                                    const float* __restrict__ B,
+                                                                    float* __restrict__ C,
+                                                                    unsigned int size);
+template void __global__ base_operator_kernel<BASE_OPERATOR_OP_MIN>(const float* __restrict__ A,
+                                                                    const float* __restrict__ B,
+                                                                    float* __restrict__ C,
+                                                                    unsigned int size);
+template void __global__ base_operator_kernel<BASE_OPERATOR_OP_MAX>(const float* __restrict__ A,
                                                                     const float* __restrict__ B,
                                                                     float* __restrict__ C,
                                                                     unsigned int size);

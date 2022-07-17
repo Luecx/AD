@@ -24,18 +24,35 @@
 #define AD_MAX_H
 #include "../../operations/reduce_mat/reduce_mat.h"
 #include "../Node.h"
+#include "../../operations/operations.h"
+
 struct Max : public Node<float> {
 
     Node<float>* input {};
+    Node<float>* second {};
 
-    Max(Node<float>* input)
-        : Node<float> {Dimension(1)}, input(input) {}
+    Max(Node<float>* input, Node<float>* second=nullptr)
+        : Node<float> {Dimension(second == nullptr ? 1 : second->getPartialDimension())}, input(input) {}
 
     virtual void forward() {
-        reduce_mat<DEVICE, REDUCE_MATRIX_OP_MAX, false>(input->values, this->values);
+        if(second == nullptr){
+
+           reduce_mat<DEVICE, REDUCE_MATRIX_OP_MAX, false>(input->values, this->values);
+        }else{
+            base_operator<DEVICE, BASE_OPERATOR_OP_MAX>(input->values, second->values, this->values);
+        }
     }
     virtual void backwards() {
-        reduce_mat_bp<DEVICE, REDUCE_MATRIX_OP_MAX, false>(input->values, input->gradients, this->values, this->gradients);
+        if(second == nullptr){
+            reduce_mat_bp<DEVICE, REDUCE_MATRIX_OP_MAX, false>(input->values, input->gradients, this->values, this->gradients);
+
+        }else{
+            base_operator_bp<DEVICE, BASE_OPERATOR_OP_MAX>(input->values,
+                                                           input->gradients,
+                                                           second->values,
+                                                           second->gradients,
+                                                           this->gradients);
+        }
     }
 
     virtual void      clearWeightGradients() {}

@@ -46,6 +46,12 @@ __global__ void base_operator_bp_kernel(
     } else if constexpr (operation == BASE_OPERATOR_OP_MUL) {
         A_grd[idx] += C_grd[idx] * B[idx];
         B_grd[idx] += C_grd[idx] * A[idx];
+    } else if constexpr (operation == BASE_OPERATOR_OP_MIN) {
+        A_grd[idx] += C_grd[idx] * (A[idx] <= B[idx]);
+        B_grd[idx] += C_grd[idx] * (B[idx] <= A[idx]);
+    } else if constexpr (operation == BASE_OPERATOR_OP_MAX) {
+        A_grd[idx] += C_grd[idx] * (A[idx] >= B[idx]);
+        B_grd[idx] += C_grd[idx] * (B[idx] >= A[idx]);
     }
 }
 
@@ -72,6 +78,22 @@ template void __global__
                                                   unsigned int size);
 template void __global__
     base_operator_bp_kernel<BASE_OPERATOR_OP_MUL>(const float* __restrict__ A,
+                                                  float* __restrict__ A_grd,
+                                                  const float* __restrict__ B,
+                                                  float* __restrict__ B_grd,
+                                                  const float* __restrict__ C_grd,
+                                                  unsigned int size);
+
+template void __global__
+    base_operator_bp_kernel<BASE_OPERATOR_OP_MIN>(const float* __restrict__ A,
+                                                  float* __restrict__ A_grd,
+                                                  const float* __restrict__ B,
+                                                  float* __restrict__ B_grd,
+                                                  const float* __restrict__ C_grd,
+                                                  unsigned int size);
+
+template void __global__
+    base_operator_bp_kernel<BASE_OPERATOR_OP_MAX>(const float* __restrict__ A,
                                                   float* __restrict__ A_grd,
                                                   const float* __restrict__ B,
                                                   float* __restrict__ B_grd,

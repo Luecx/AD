@@ -27,17 +27,34 @@
 struct Min : public Node<float> {
 
     Node<float>* input {};
+    Node<float>* second {nullptr};
 
-    Min(Node<float>* input)
-        : Node<float> {Dimension(1)}, input(input) {}
+    Min(Node<float>* input, Node<float>* second = nullptr)
+        : Node<float> {Dimension(second == nullptr ? 1 : second->getPartialDimension())},
+          input(input), second(second) {}
 
     virtual void forward() {
-        reduce_mat<DEVICE, REDUCE_MATRIX_OP_MIN, false>(input->values, this->values);
+        if (second == nullptr)
+            reduce_mat<DEVICE, REDUCE_MATRIX_OP_MIN, false>(input->values, this->values);
+        else {
+            base_operator<DEVICE, BASE_OPERATOR_OP_MIN>(input->values, second->values, this->values);
+        }
     }
     virtual void backwards() {
-        reduce_mat_bp<DEVICE, REDUCE_MATRIX_OP_MIN, false>(input->values, input->gradients, this->values, this->gradients);
+        if (second == nullptr)
+            reduce_mat_bp<DEVICE, REDUCE_MATRIX_OP_MIN, false>(input->values,
+                                                               input->gradients,
+                                                               this->values,
+                                                               this->gradients);
+        else {
+            base_operator_bp<DEVICE, BASE_OPERATOR_OP_MIN>(input->values,
+                                                           input->gradients,
+                                                           second->values,
+                                                           second->gradients,
+                                                           this->gradients);
+        }
     }
 
-    virtual void      clearWeightGradients() {}
+    virtual void clearWeightGradients() {}
 };
 #endif    // AD_MEAN_H

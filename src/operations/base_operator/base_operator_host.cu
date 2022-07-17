@@ -30,7 +30,6 @@ void base_operator_host(
     // clang-format on
 
     for (int idx = 0; idx < size; idx++) {
-        float temp;
 
         if constexpr (operation == BASE_OPERATOR_OP_ADD) {
             C[idx] = A[idx] + B[idx];
@@ -40,6 +39,10 @@ void base_operator_host(
             C[idx] = A[idx] / B[idx];
         } else if constexpr (operation == BASE_OPERATOR_OP_MUL) {
             C[idx] = A[idx] * B[idx];
+        } else if constexpr (operation == BASE_OPERATOR_OP_MIN) {
+            C[idx] = std::min(A[idx], B[idx]);
+        } else if constexpr (operation == BASE_OPERATOR_OP_MAX) {
+            C[idx] = std::max(A[idx], B[idx]);
         }
     }
 }
@@ -57,6 +60,14 @@ template void base_operator_host<BASE_OPERATOR_OP_DIV>(const float* A,
                                                        float*       C,
                                                        unsigned int size);
 template void base_operator_host<BASE_OPERATOR_OP_MUL>(const float* A,
+                                                       const float* B,
+                                                       float*       C,
+                                                       unsigned int size);
+template void base_operator_host<BASE_OPERATOR_OP_MIN>(const float* A,
+                                                       const float* B,
+                                                       float*       C,
+                                                       unsigned int size);
+template void base_operator_host<BASE_OPERATOR_OP_MAX>(const float* A,
                                                        const float* B,
                                                        float*       C,
                                                        unsigned int size);

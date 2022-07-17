@@ -44,6 +44,12 @@ void base_operator_bp_host(
         } else if constexpr (operation == BASE_OPERATOR_OP_MUL) {
             A_grd[idx] += C_grd[idx] * B[idx];
             B_grd[idx] += C_grd[idx] * A[idx];
+        } else if constexpr (operation == BASE_OPERATOR_OP_MIN) {
+            A_grd[idx] += C_grd[idx] * (A[idx] <= B[idx]);
+            B_grd[idx] += C_grd[idx] * (B[idx] <= A[idx]);
+        } else if constexpr (operation == BASE_OPERATOR_OP_MAX) {
+            A_grd[idx] += C_grd[idx] * (A[idx] >= B[idx]);
+            B_grd[idx] += C_grd[idx] * (B[idx] >= A[idx]);
         }
     }
 }
@@ -67,6 +73,18 @@ template void base_operator_bp_host<BASE_OPERATOR_OP_DIV>(const float* A,
                                                           const float* C_grd,
                                                           unsigned int size);
 template void base_operator_bp_host<BASE_OPERATOR_OP_MUL>(const float* A,
+                                                          float*       A_grd,
+                                                          const float* B,
+                                                          float*       B_grd,
+                                                          const float* C_grd,
+                                                          unsigned int size);
+template void base_operator_bp_host<BASE_OPERATOR_OP_MIN>(const float* A,
+                                                          float*       A_grd,
+                                                          const float* B,
+                                                          float*       B_grd,
+                                                          const float* C_grd,
+                                                          unsigned int size);
+template void base_operator_bp_host<BASE_OPERATOR_OP_MAX>(const float* A,
                                                           float*       A_grd,
                                                           const float* B,
                                                           float*       B_grd,
