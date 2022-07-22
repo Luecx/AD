@@ -57,6 +57,14 @@ Type uniform(Type min, Type max) {
     }
 }
 
+template<typename Type>
+void shuffle(Type* begin, int count){
+    for(int i = 0; i < count; i++){
+        int idx = uniform(0, count-1);
+        std::swap(begin[i], begin[idx]);
+    }
+}
+
 }    // namespace random
 
 #endif    // AD_RANDOM_H

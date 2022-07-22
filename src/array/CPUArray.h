@@ -37,8 +37,8 @@ struct CPUArray : Array<Type> {
     Type  operator[](ArraySizeType idx) const { return this->m_data[idx]; }
 
     void  copyFrom(const CPUArray<Type>& other) {
-         ASSERT(other.size() == this->size(), "invalid dimension of second array");
-         memcpy(this->m_data, other.m_data, this->size() * sizeof(Type));
+//         ASSERT(other.size() == this->size(), "invalid dimension of second array");
+         memcpy(this->m_data, other.m_data, std::min(this->size(), other.size()) * sizeof(Type));
     }
     void clear() { memset(this->m_data, 0, sizeof(Type) * this->size()); }
 };

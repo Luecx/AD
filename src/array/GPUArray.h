@@ -44,8 +44,8 @@ struct GPUArray : Array<Type> {
     }
 
     void copyFrom(const GPUArray<Type>& other) {
-        ASSERT(other.size() == this->size(), "invalid dimension of second array");
-        cudaMemcpy(this->m_data, other.m_data, this->size() * sizeof(Type), cudaMemcpyDeviceToDevice);
+//        ASSERT(other.size() == this->size(), "invalid dimension of second array");
+        cudaMemcpy(this->m_data, other.m_data, std::min(this->size(), other.size()) * sizeof(Type), cudaMemcpyDeviceToDevice);
     }
     void clear() { cudaMemset(this->m_data, 0, sizeof(Type) * this->size()); }
 };

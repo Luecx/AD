@@ -19,6 +19,14 @@
 #ifndef CUDATEST1_SRC_DATA_DATA_H_
 #define CUDATEST1_SRC_DATA_DATA_H_
 
+#include "../assert/Assert.h"
+#include "../assert/GPUAssert.h"
+#include "../misc/random.h"
+#include "Array.h"
+#include "CPUArray.h"
+#include "GPUArray.h"
+#include "Mode.h"
+
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -27,13 +35,6 @@
 #include <new>
 #include <ostream>
 #include <random>
-#include "../assert/Assert.h"
-#include "../assert/GPUAssert.h"
-#include "../misc/random.h"
-#include "Array.h"
-#include "CPUArray.h"
-#include "GPUArray.h"
-#include "Mode.h"
 
 template<typename Type = float>
 class SArray : public Array<Type> {
@@ -46,12 +47,11 @@ class SArray : public Array<Type> {
 
     public:
     // smart pointers to cpu and gpu values
-    CPtr cpu_values = (CPtr)nullptr;
-    GPtr gpu_values = (GPtr)nullptr;
+    CPtr cpu_values = (CPtr) nullptr;
+    GPtr gpu_values = (GPtr) nullptr;
 
     public:
-    explicit SArray(ArraySizeType p_size) : Array<Type>(p_size) {
-    }
+    explicit SArray(ArraySizeType p_size) : Array<Type>(p_size) {}
     SArray(const SArray<Type>& other) : Array<Type>(other.m_size) {
         if (other.cpuIsAllocated()) {
             mallocCpu();
@@ -243,6 +243,41 @@ class SArray : public Array<Type> {
         }
     }
 
+    // create a new array based of the given slice.
+    // start is inclusive, end is exclusive
+    // only is performed on the cpu. GPU memory is not allocated
+    SArray<Type> slice(int start, int end, int inc = 1) {
+
+        if (start < 0)
+            start = (start + this->size()) % this->size();
+        if (end < start)
+            end += this->size();
+
+        if (inc > 0) {
+            ArraySizeType size = std::ceil((end - start) / inc);
+            SArray<Type>  res {size};
+            res.mallocCpu();
+
+            int idx = 0;
+            for (int i = start; i < end; i += inc) {
+                res[idx++] = this->get(i);
+            }
+            return std::move(res);
+        }
+        if (inc < 0) {
+            ArraySizeType size = std::ceil((end - start) / -inc);
+            SArray<Type>  res {size};
+            res.mallocCpu();
+
+            int idx = 0;
+            for (int i = end - 1; i >= start; i += inc) {
+                res[idx++] = this->get(i);
+            }
+            return std::move(res);
+        }
+        return SArray<Type> {0};
+    }
+
     // randomisation
     void randomise(Type lower = 0, Type upper = 1) {
         if (cpu_values == nullptr)
@@ -271,7 +306,8 @@ class SArray : public Array<Type> {
         if (!data.cpuIsAllocated())
             return os;
         for (int n = 0; n < data.size(); n++) {
-            os << std::setw(11) << (double) data.get(n);
+            os << std::fixed << std::setw(12) << std::right << std::setprecision(4)
+               << (double) data.get(n);
         }
         os << "\n";
         return os;

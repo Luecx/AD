@@ -20,10 +20,13 @@
 // Created by Luecx on 14.07.2022.
 //
 
-#ifndef AD_CARPOLE_H
-#define AD_CARPOLE_H
+#ifndef AD_CARTPOLE_H
+#define AD_CARTPOLE_H
 
 #include "../../array/SArray.h"
+
+namespace rl::env {
+
 struct Variable {
     float der_0 = 0;
     float der_1 = 0;
@@ -45,23 +48,24 @@ struct Variable {
     }
 };
 
-class CarPole {
-    Variable theta{random::uniform(-0.05f,0.05f), random::uniform(-0.05f,0.05f)};
-    Variable coord{2.0f, random::uniform(-0.05f,0.05f)};
+class CartPole {
+    Variable theta {random::uniform(-0.05f, 0.05f), random::uniform(-0.05f, 0.05f)};
+    Variable coord {random::uniform(-0.05f, 0.05f), random::uniform(-0.05f, 0.05f)};
 
     // only use value for force / accumulated time
     Variable    force;
     Variable    time;
 
     const float gravity         = 9.81;    // gravity pulling the pole down
-    const float mass_car        = 10;      // mass of the car
-    const float mass_pole       = 1;       // mass of the pole
+    const float mass_car        = 1.0;      // mass of the car
+    const float mass_pole       = 0.1;       // mass of the pole
     const float length_pole     = 0.5;     // length of the pole
 
     const float time_difference = 0.02;    // time difference for integration
     const float force_magnitude = 10;      // force for input
 
     public:
+    CartPole(bool swingup=false);
 
     // do a step in the environment
     void step();
@@ -73,5 +77,6 @@ class CarPole {
     // control = 1 -> stear right
     void control(int control);
 };
+}    // namespace rl::env
 
-#endif    // AD_CARPOLE_H
+#endif    // AD_CARTPOLE_H

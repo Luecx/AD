@@ -41,7 +41,7 @@ void iteration(std::vector<Episode>& episodes,
 
     auto acti     = policy_loss_graph.addInput<int  >  (Dimension(1));
     auto adva     = policy_loss_graph.addInput<float>  (Dimension(1));
-    auto prev_out = policy_loss_graph.addInput<float>  (Dimension(2));
+    auto prev_out = policy_loss_graph.addInput<float>  (policy_network.getOutput()->getPartialDimension());
     auto sel_curr = policy_loss_graph.addNode<Select>  (policy_network.getOutput(), acti);
     auto sel_prev = policy_loss_graph.addNode<Select>  (prev_out, acti);
     auto ratio    = policy_loss_graph.addNode<Div>     (sel_curr, sel_prev);
@@ -83,7 +83,6 @@ void iteration(std::vector<Episode>& episodes,
     int idx = 0;
     for (auto& h : episodes) {
         for (auto& s : h.states) {
-
             for(int i = 0; i < s.m_p_values.size(); i++){
                 prev_out->values(idx, i) = s.m_p_values[i];
             }
@@ -101,8 +100,6 @@ void iteration(std::vector<Episode>& episodes,
     for (int i = 0; i < adva->values.size(); i++) {
         adva->values[i] = (adva->values[i] - mean) / std::max(1e-12f, std);
     }
-
-
 
     // generate the input for the policy and value network
     idx = 0;
